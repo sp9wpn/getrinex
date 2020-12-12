@@ -30,10 +30,10 @@ urls[2]=https://cddis.nasa.gov/archive/gnss/data/daily/${rok4}/brdc/brdc${dzien}
 # urls[3]=http://aprs.ehamnet.cz/gps_rinex_usable_1h_nasa.txt
 
 for u in ${urls[@]}; do
-  if [ ${u: -2} = '.Z' -o  ${u: -2} = '.z' ] ; then
-    rm -f rinex.txt.tmp.Z
-    wget --auth-no-challenge -t 3 -O rinex.txt.tmp.Z $u || continue
-    gzip -f -d rinex.txt.tmp.Z || continue
+  if [ ${u: -3} = '.GZ' -o  ${u: -3} = '.gz' ] ; then
+    rm -f rinex.txt.tmp.gz
+    wget --auth-no-challenge -t 3 -O rinex.txt.tmp.gz $u || continue
+    gzip -f -d rinex.txt.tmp.gz || continue
   else
     rm -f rinex.txt.tmp
     wget --auth-no-challenge -t 3 -O rinex.txt.tmp $u || continue
