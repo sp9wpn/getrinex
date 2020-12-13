@@ -1,9 +1,7 @@
 #!/bin/bash
-SCRIPT_DIR=${PWD}
-cd /tmp/
+TMP_DIR=/tmp
 
-
-# Aby miec dostep do danych na serwerach NASA, nalezy zalozyc konto na stronie:
+# Aby miec dostep do danych na serwerze NASA, nalezy zalozyc konto na stronie:
 #   https://urs.earthdata.nasa.gov/users/new
 # a nastepnie w katalogu glownym uzytkownika umiescic plik ~/.netrc o tresci:
 # machine urs.earthdata.nasa.gov login <login> password <haslo>
@@ -12,6 +10,13 @@ cd /tmp/
 #   https://urs.earthdata.nasa.gov/users/new
 # then create a ~/.netrc file in user home directory containing:
 # machine urs.earthdata.nasa.gov login <login> password <password>
+
+if [ -z "$1" ] ; then
+  echo "Usage:  $0 <local_rinex>"
+  echo ""
+  echo "  local_rinex - filename to place downloaded rinex data into"
+  exit 0
+fi
 
 
 dzien=$(date -u +%j)
@@ -31,24 +36,23 @@ urls[2]=https://cddis.nasa.gov/archive/gnss/data/daily/${rok4}/brdc/brdc${dzien}
 
 for u in ${urls[@]}; do
   if [ ${u: -3} = '.GZ' -o  ${u: -3} = '.gz' ] ; then
-    rm -f rinex.txt.tmp.gz
-    wget --auth-no-challenge -t 3 -O rinex.txt.tmp.gz $u || continue
-    gzip -f -d rinex.txt.tmp.gz || continue
+    rm -f ${TMP_DIR}/rinex.txt.tmp.gz
+    wget --auth-no-challenge --timeout=20 -t 3 -O ${TMP_DIR}/rinex.txt.tmp.gz $u || continue
+    gzip -f -d ${TMP_DIR}/rinex.txt.tmp.gz || continue
   else
-    rm -f rinex.txt.tmp
-    wget --auth-no-challenge -t 3 -O rinex.txt.tmp $u || continue
+    rm -f ${TMP_DIR}/rinex.txt.tmp
+    wget --auth-no-challenge --timeout=20 -t 3 -O ${TMP_DIR}/rinex.txt.tmp $u || continue
   fi
 
-  if [ -r rinex.txt.tmp -a `wc -c rinex.txt.tmp | cut -d " " -f 1` -gt 2000 ] ; then
-    mv -f rinex.txt.tmp /home/pi/dxlAPRS/tmp/rinex.txt
+  if [ -r ${TMP_DIR}/rinex.txt.tmp -a `wc -c ${TMP_DIR}/rinex.txt.tmp | cut -d " " -f 1` -gt 2000 ] ; then
+    mv -f ${TMP_DIR}/rinex.txt.tmp $1
     exit 0
   fi
 done
 
 
-# Próbujemy wczorajszy
+# no success, try yesterday's file
 if [ "$1" != "yesterday" ] ; then
   echo "retry for yesterday's file"
-  cd ${SCRIPT_DIR}
   $0 yesterday
 fi
