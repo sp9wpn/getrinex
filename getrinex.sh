@@ -18,6 +18,11 @@ if [ -z "$1" ] ; then
   exit 0
 fi
 
+if [ -d "$1" ] ; then
+  echo "Error: $1 is a directory, expecting a file"
+  exit 0
+fi
+
 
 dzien=$(date -u +%j)
 rok2=$(date -u +%y)
