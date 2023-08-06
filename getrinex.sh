@@ -28,7 +28,7 @@ dzien=$(date -u +%j)
 rok2=$(date -u +%y)
 rok4=$(date -u +%Y)
 
-if [ "$1" = "yesterday" ] ; then
+if [ "$2" = "yesterday" ] ; then
   dzien=$(date --date='yesterday' -u +%j)
   rok2=$(date --date='yesterday' -u +%y)
   rok4=$(date --date='yesterday' -u +%Y)
@@ -57,7 +57,7 @@ done
 
 
 # no success, try yesterday's file
-if [ "$1" != "yesterday" ] ; then
+if [ "$2" != "yesterday" ] ; then
   echo "retry for yesterday's file"
-  $0 yesterday
+  $0 $1 yesterday
 fi
